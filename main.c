@@ -12,10 +12,10 @@
 #include <stdbool.h>
 #include <pthread.h>
 //mine
-#include <init.h>
-#include <screen.h>
-#include <timing.h>
-#include <input.h>
+#include "timing.h"
+#include "screen.h"
+#include "init.h"
+#include "input.h"
 
 int times = 0;
 long total = 0;

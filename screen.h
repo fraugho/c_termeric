@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <init.h>
-#include <timing.h>
-#include <buffer.h>
+#include "init.h"
+#include "timing.h"
+#include "buffer.h"
 
 typedef struct Screen {
     int width, height;
