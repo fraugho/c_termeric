@@ -1,2 +1,2 @@
-# c_terminator
+# c_termeric
 Terminal Game Engine
