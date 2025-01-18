@@ -1,6 +1,7 @@
 #ifndef INIT_H
 #define INIT_H
 
+#include <stdint.h>
 #include <unistd.h>
 #include <termios.h>
 #include <stdlib.h>
@@ -19,7 +20,7 @@ void die(const char *c) {
 }
 
 /* Window size handling */
-int get_cursor_position(int *rows, int *cols) {
+int get_cursor_position(uint16_t *rows, uint16_t *cols) {
     char buf[32];
     unsigned int i = 0;
 
@@ -33,12 +34,12 @@ int get_cursor_position(int *rows, int *cols) {
     buf[i] = '\0';
 
     if (buf[0] != '\x1b' || buf[1] != '[') return -1;
-    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
+    if (sscanf(&buf[2], "%hu;%hu", rows, cols) != 2) return -1;
 
     return 0;
 }
 
-int get_window_size(int *rows, int *cols) {
+int get_window_size(uint16_t *rows, uint16_t *cols) {
     struct winsize ws;
 
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
@@ -50,5 +51,30 @@ int get_window_size(int *rows, int *cols) {
         return 0;
     }
 }
+
+struct termios og_termios;
+
+void disable_raw_mode() {
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &og_termios) == -1)
+        die("tcsetattr");
+}
+
+void enable_raw_mode() {
+    if (tcgetattr(STDIN_FILENO, &og_termios) == -1)
+        die("tcgetattr");
+    atexit(disable_raw_mode);
+
+    struct termios raw = og_termios;
+    raw.c_iflag &= ~(IXON | ICRNL | BRKINT | INPCK | ISTRIP);
+    raw.c_oflag &= ~(OPOST);
+    raw.c_cflag |= (CS8);
+    raw.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN);
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 1;  // Read timeout in deciseconds
+
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
+        die("tcsetattr");
+}
+
 
 #endif
