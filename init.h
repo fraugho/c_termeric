@@ -10,6 +10,8 @@
 #include <sys/ioctl.h>
 
 bool debug = false;
+int num_frames = 10;
+const size_t BUF_SIZE = 8000;
 
 /* Terminal handling */
 void die(const char *c) {
@@ -51,6 +53,7 @@ int get_window_size(uint16_t *rows, uint16_t *cols) {
         return 0;
     }
 }
+
 
 struct termios og_termios;
 

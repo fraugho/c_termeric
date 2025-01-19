@@ -13,20 +13,28 @@
 typedef struct Screen {
     Buffer* frames;
     uint16_t width, height;
-    bool running;
 } Screen;
 
 /* Global state */
 struct Screen screen;
-int num_frames = 10;
-const size_t BUF_SIZE = 8000;
+
+#define RENDER 1 << 1
+#define IO 1 << 2
+
+static inline void draw_blank(){
+    char* buf = (char*)malloc(screen.width * screen.height);
+    memset(buf, ' ', screen.width * screen.height);
+    write(STDOUT_FILENO, buf, screen.width * screen.height);
+}
 
 void screen_init() {
+    enable_raw_mode();
     if (get_window_size(&screen.height, &screen.width) == -1){
         die("get_window_size");
     }
-
     screen.height -= debug;
+
+    draw_blank();
 
     // Hide cursor
     write(STDOUT_FILENO, "\x1b[?25l", 6);
@@ -40,14 +48,6 @@ void screen_init() {
         screen.frames[i].used = 0;
         screen.frames[i].state = RENDER;
     }
-
-    screen.running = true;
-}
-
-static inline void draw_blank(){
-    char* buf = (char*)malloc(screen.width * screen.height);
-    memset(buf, '#', screen.width * screen.height);
-    write(STDOUT_FILENO, buf, screen.width * screen.height);
 }
 
 void clean_square(Buffer* buf, uint16_t tlc_x, uint16_t tlc_y, uint16_t brc_x, uint16_t brc_y, char c) {
@@ -89,6 +89,7 @@ static inline void draw_pixel(Buffer* buf, uint16_t x, uint16_t y, char c){
 }
 
 static inline void free_screen(){
+    disable_raw_mode();
     for(int i = 0; i < num_frames; ++i){
         buf_free(&screen.frames[i]);
     }
