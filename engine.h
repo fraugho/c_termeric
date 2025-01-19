@@ -7,12 +7,12 @@
 #include <string.h>
 #include <stdbool.h>
 #include <pthread.h>
+#include <unistd.h>
 //mine
 #include "timing.h"
 #include "screen.h"
 #include "init.h"
 #include "input.h"
-
 
 int times = 0;
 int64_t total = 0;
@@ -90,7 +90,7 @@ void engine_init(){
 
     RUNNING = false;
 
-    for(int i = 0; i < 3; i++) {
+    for(int i = 0; i < 2; i++) {
         pthread_join(threads[i], NULL);
     }
 
