@@ -26,7 +26,14 @@ bool RUNNING = true;
 
 int remaining_threads = 0;
 
-void* thread_render();
+void render();
+
+void* thread_render(){
+    while(RUNNING){
+        render();
+    }
+    return NULL;
+}
 
 /* Writing */
 void* thread_write() {
