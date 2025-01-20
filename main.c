@@ -1,11 +1,13 @@
-/* Terminator - A simple terminal graphics system */
-/* Standard includes */
+/* Termeric - A simple terminal graphics engine */
 #include <stdbool.h>
-//mine
 #include "engine.h"
+#include "input.h"
 
 /* Rendering */
 void render() {
+    if(get_key() == CTRL_KEY('q')){
+        engine_close();
+    }
 }
 
 /* Main entry point */
