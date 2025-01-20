@@ -1,12 +1,10 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include <stdint.h>
 #include <unistd.h>
 #include <termios.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 #include <sys/ioctl.h>
 
 bool debug = false;
@@ -78,6 +76,5 @@ void enable_raw_mode() {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
         die("tcsetattr");
 }
-
 
 #endif
