@@ -13,5 +13,6 @@ void render() {
 /* Main entry point */
 int main() {
     engine_init();
+    //engine_benchmark(1000);
     return 0;
 }

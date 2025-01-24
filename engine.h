@@ -89,12 +89,12 @@ void engine_init(){
     pthread_create(&threads[1], NULL, thread_write, NULL);
 
     long cpu_num = sysconf(_SC_NPROCESSORS_ONLN);
-    remaining_threads += cpu_num - 2;
+    //Subtracted writing thread, render thread, and main thread
+    remaining_threads += cpu_num - 2 - 1;
 
     while (RUNNING) {
         last_key = editor_read_key();
     }
-
 
     for(int i = 0; i < 2; i++) {
         pthread_join(threads[i], NULL);
