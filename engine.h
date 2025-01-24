@@ -1,13 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/ioctl.h>
-#include <string.h>
-#include <stdbool.h>
 #include <pthread.h>
-#include <unistd.h>
 //mine
 #include "timing.h"
 #include "screen.h"
@@ -26,7 +20,18 @@ bool RUNNING = true;
 
 int remaining_threads = 0;
 
-void* thread_render();
+void render();
+
+void* thread_render(){
+    while(RUNNING){
+        if (screen.frames[render_index].state == RENDER) {
+            render();
+            screen.frames[render_index].state = IO;
+            render_index = (render_index + 1) % num_frames;
+        }
+    }
+    return NULL;
+}
 
 /* Writing */
 void* thread_write() {
@@ -76,19 +81,20 @@ void print_perf(){
 void engine_init(){
     screen_init();
 
-    long cpu_num = sysconf(_SC_NPROCESSORS_ONLN);
-    pthread_t threads[cpu_num];
+    const int BASIC_TASK_TC = 2;
+
+    pthread_t threads[BASIC_TASK_TC];
 
     pthread_create(&threads[0], NULL, thread_render, NULL);
     pthread_create(&threads[1], NULL, thread_write, NULL);
 
-    remaining_threads += cpu_num - 2;
+    long cpu_num = sysconf(_SC_NPROCESSORS_ONLN);
+    //Subtracted writing thread, render thread, and main thread
+    remaining_threads += cpu_num - 2 - 1;
 
-    while (last_key != CTRL_KEY('q')) {
+    while (RUNNING) {
         last_key = editor_read_key();
     }
-
-    RUNNING = false;
 
     for(int i = 0; i < 2; i++) {
         pthread_join(threads[i], NULL);
@@ -98,4 +104,7 @@ void engine_init(){
     print_perf();
 }
 
+static inline void engine_close(){
+    RUNNING = false;
+}
 #endif

@@ -2,13 +2,14 @@
 #define INPUT_H
 
 #include <unistd.h>
+#include <errno.h>
 
 #include "init.h"
 
 //ctrl key macro
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-int last_key = 0;
+volatile int last_key = 0;
 
 enum SpecialKeys {
     ESCAPE_KEY = 27,
@@ -58,7 +59,7 @@ int editor_read_key() {
     return c;
 }
 
-static inline int get_key(){
+int get_key(){
     return last_key;
 }
 
